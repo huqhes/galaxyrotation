@@ -18,7 +18,7 @@ dDec = header['CDELT2'] # arcseconds
 dV = header['CDELT3'] # m/s
 
 # ESTIMATE DISTANCE TO GALAXY (vel0/h0) AND ANGULAR DISTANCE
-h0 = 500000 # HUBBLE CONSTANT (m/s/Mpc)
+h0 = 71000 # HUBBLE CONSTANT (m/s/Mpc)
 distance = vel0/h0 # Mpc
 dPos = dDec * 2*np.pi * distance / 1.296 # pc
 print('Distance = ', distance, ' Mpc')
@@ -29,6 +29,7 @@ plt.figure(1)
 plt.rcParams['image.cmap'] = 'cubehelix'
 plt.subplot(121)
 plt.imshow(np.sum(cube,axis=0))
+plt.axis('off')
 plt.title('No Noise Reduction')
 
 # NOISE REDUCTION
@@ -37,6 +38,7 @@ cube[cube < 0.001] = 0
 # PLOT CUBE WITH NOISE REDUCTION
 plt.subplot(122)
 plt.imshow(np.sum(cube,axis=0))
+plt.axis('off')
 plt.title('Noise Reduction')
 
 # PLOT ANIMATED CUBE WITH CHANGING WAVELENGTH
@@ -47,17 +49,22 @@ for i in range(cube.shape[0]):
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=100)
-plt.title('Images captured in various wavelengths')
+plt.title('Spectral Imaging of Galaxy')
+plt.axis('off')
 
 # COMPRESS CUBE DATA
-block = 10
+block = 5
 cube_ = block_reduce(cube, block_size=(1,block,block), func=np.mean)
 cube_[cube_ < 0.001] = 0
 
 plt.figure(3)
 plt.subplot(121)
+plt.axis('off')
 plt.imshow(np.sum(cube_, axis=0))
-plt.title('Uncompressed Image')
+if (block == 1):
+    plt.title('Uncompressed Image')
+else:
+    plt.title('Compressed Image')
 
 # PLOT ROTATION CURVE
 mid = [np.floor(cube_.shape[1]/2), np.floor(cube_.shape[2]/2)]
@@ -81,7 +88,7 @@ for i in range(np.shape(v)[0]):
     v[i] = np.mean(v[i])
 
 plt.scatter(r,v)
-plt.xlabel('Radius (pc)')
+plt.xlabel('Radius (parsec)')
 plt.ylabel('Velocity (m/s)')
 plt.title('Rotation Curve')
 plt.show()
